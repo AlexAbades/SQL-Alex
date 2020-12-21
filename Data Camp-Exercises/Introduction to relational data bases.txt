@@ -1,0 +1,758 @@
+1 - Get information on all table names in the current database, while limiting your query to the 'public' table_schema.
+
+SELECT table_schema, table_name
+FROM information_schema.tables
+WHERE table_schema = 'public';
+
+
+
+2 - Now have a look at the columns in university_professors by selecting all entries in information_schema.columns that correspond to that table.
+-- Query the right table in information_schema to get columns
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'university_professors' AND table_schema = 'public';
+
+
+
+3 - Finally, print the first five rows of the university_professors table.
+SELECT * 
+FROM university_professors 
+LIMIT 5;
+
+
+CREATE TABLE table_name (
+ column_a data_type,
+ column_b data_type, 
+ column_c data_type,
+);
+
+
+
+4 - Create a table professors with two text columns: firstname and lastname.
+CREATE TABLE professors (
+ firstname text,
+ lastname text
+);
+
+-- Print the contents of this table
+SELECT * 
+FROM professors
+
+
+
+5 - Create a table universities with three text columns: university_shortname, university, and university_city.
+CREATE TABLE universities(
+    university_shortname text, 
+    university text,
+    university_city text
+);
+
+-- Print the contents of this table
+SELECT * 
+FROM universities
+
+
+ADD COLUMNS TO EMPTY TABLES 
+ALTER TABLE table_name 
+ADD COLUMN solumn_name data_type;
+
+
+
+6 - Alter professors to add the text column university_shortname.
+ALTER TABLE professors
+ADD COLUMN university_shortname TEXT;
+
+-- Print the contents of this table
+SELECT * 
+FROM professors
+
+
+TO COPY DATA TO A NEW TABLE:
+
+INSERT INTO table_name (target table)
+SELECT DISTINCT Colum_names, column_name
+FROM table_name (where comes come from)
+
+
+
+WE CAN ALSO USE IT:
+
+INSERT INTO table_name (column_a, coluk¡mn_b)
+VALUES ("value_a", value_b");
+
+
+TO CHANGE THE NAME OF THE COLUMN:
+
+ALTER TABLE column_name
+RENAME COLUMN old_name TO new_name;
+
+FOR DROP COLUMN:
+
+ALTER TABLE table_name 
+DROP COLUMN column_name;
+
+
+
+7 -Rename the organisation column to organization in affiliations and Delete the university_shortname column in affiliations.
+ALTER TABLE affiliations
+RENAME COLUMN organisation TO organization;
+
+ALTER TABLE affiliations
+DROP COLUMN university_shortname;
+
+
+
+8 - Insert all DISTINCT professors from university_professors into professors.
+Print all the rows in professors.
+
+-- Insert unique professors into the new table
+INSERT INTO professors 
+SELECT DISTINCT firstname, lastname, university_shortname 
+FROM university_professors;
+
+-- Doublecheck the contents of professors
+SELECT * 
+FROM professors;
+
+
+
+9 - Insert all DISTINCT affiliations into affiliations from university_professors.
+-- Insert unique affiliations into the new table
+INSERT INTO affiliations 
+SELECT DISTINCT firstname, lastname, function, organization 
+FROM university_professors;
+
+-- Doublecheck the contents of affiliations
+SELECT * 
+FROM affiliations;
+
+
+
+10 - -- Delete the university_professors table
+DROP TABLE university_professors;
+
+CAST 
+Used to converto or change data types.
+
+
+
+11 - Check and find the error
+
+-- Let's add a record to the table
+INSERT INTO transactions (transaction_date, amount, fee) 
+VALUES ('2018-09-24', 5454, '30');
+
+-- Doublecheck the contents
+SELECT *
+FROM transactions;
+
+
+
+12 - Change the data type
+-- Calculate the net amount as amount + fee
+SELECT transaction_date, amount + CAST(fee AS integer) AS net_amount 
+FROM transactions;
+
+
+
+DATA TYPES
+
+text --> character strings of any length 
+varchar(x) --> A maximum of x characters
+char(x) --> a fixed length of x characters
+boolean --> can only take three states; True, False, Null 
+date, time, timestamp --> various formats for date and time calculations
+numeriC --> arbitrary precision numbers, e.g. 3.1457
+numeric(x,y) -->  a digit with a total of x numbers which y of them are after the fractional point. E.g. numeric(3,2) --> 3.54
+integer --> whole numbers in the range of [-2147483648, +2147483648]
+
+
+The syntax for changing the data type of a column is straightforward. The following code changes the data type of the column_name column in table_name to varchar(10):
+ALTER TABLE table_name
+ALTER COLUMN column_name
+TYPE varchar(10)
+
+
+
+13 -Have a look at the distinct university_shortname values in the professors table and take note of the length of the strings.
+-- Select the university_shortname column
+SELECT DISTINCT(university_shortname) 
+FROM professors;
+
+
+
+14 - Now specify a fixed-length character type with the correct length for university_shortname.
+-- Specify the correct fixed-length character type
+ALTER TABLE professors
+ALTER COLUMN university_shortname
+TYPE CHAR (3) ;
+
+
+
+15 -Change the type of the firstname column to varchar(64).
+-- Change the type of firstname
+ALTER TABLE professors
+ALTER COLUMN firstname
+TYPE varchar(64);
+
+
+If you don't want to reserve too much space for a certain varchar column, you can truncate the values before converting its type.
+
+For this, you can use the following syntax:
+ALTER TABLE table_name
+ALTER COLUMN column_name
+TYPE varchar(x)
+USING SUBSTRING(column_name FROM 1 FOR x)
+
+That means, if you have a column which has already values, and you want to reduce the dimensionality of the character, integer... you have to drop the letters, or the information that can't by storaged due to the restriction, you then should use the USING funtion, in this particular case the SUBSTRING which retains the x firrst values of the string
+
+
+
+16 -Run the sample code as is and take note of the error.
+-- Convert the values in firstname to a max. of 16 characters
+ALTER TABLE professors 
+ALTER COLUMN firstname 
+TYPE varchar(16)
+USING SUBSTRING(firstname FROM 1 FOR 16);
+-- Select the column to see the valuies 
+SELECT firstname
+FROM professors;
+
+
+THEORY 
+CONSTRAINS
+NOT NULL values 
+if you specify not null values after the data type, this column won't be able to store null valuesIf you don't spefy it the will be able to hold null values
+E.g. 
+CREATE TABLE table_name(
+ column_a data_type not null 
+ column_b data_type not null
+ column_c data_type
+);
+
+To modify an excisting table 
+ALTER TABLE table_name
+ALTER COLUMN column_name
+SET/DROP NOT NULL;
+
+UNIQUE CONTRAINS: The UNIQUE constraint ensures that all values in a column are different.
+
+CREATE TABLE table_name (
+ column_name UNIQUE
+);
+
+TO MODIFY 
+
+ALTER TABLE table_name
+ADD CONSTRAIN some_name UNIQUE(column_name);
+
+
+
+17 -Add a not-null constraint for the firstname column.
+-- Disallow NULL values in firstname
+ALTER TABLE professors 
+ALTER COLUMN firstname SET NOT NULL;
+
+
+
+18 -Add a not-null constraint for the lastname column.
+-- Disallow NULL values in lastname
+ALTER TABLE professors
+ALTER COLUMN lastname SET NOT NULL; 
+
+
+
+19 - Check code
+INSERT INTO professors (firstname, lastname, university_shortname)
+VALUES (NULL, 'Miller', 'ETH');
+
+
+
+20 -Add a unique constraint to the university_shortname column in universities. Give it the name university_shortname_unq.
+-- Make universities.university_shortname unique
+ALTER TABLE universities
+ADD CONSTRAINT university_shortname_unq UNIQUE(university_shortname);
+
+
+
+21 -Add a unique constraint to the organization column in organizations. Give it the name organization_unq.
+-- Make organizations.organization unique
+ALTER TABLE organizations
+ADD CONSTRAINT organization_unq UNIQUE(organization);
+
+
+
+
+THEORY 
+KEY CONSTRAINTS
+
+KEY--> ATTRIBUTE(S) THAT IDENTIFY A RECORD UNIQUELY
+SUPERKEY --> Attributes that can be removed 
+MININAM SUPERKEY OR KEY--> Attributes that can't be removed 
+In oder words, the keys it's a column which has no repited values
+
+SELECT COUNT(DISTINCT(column_a, column_b, ...))
+FROM table;
+
+
+PRIMARY KEYS need to be defined on columns that don't accept duplicate or null values
+
+CREATE TABLE table_name ( 
+ column_a integer PRIMARY KEY, 
+ column_b text,
+ column_c numeric
+);
+
+CREATE TABLE name_table
+ column_a integer,
+ column_a integer,
+ column_a integer,
+ PRIMARY KEY (column_a, column_C)
+);
+
+ALTER TABLE table_name
+ADD CONSTRAINT some_name PRIMARY KEY (column_name)
+
+
+
+22 -First, find out the number of rows in universities.
+-- Count the number of rows in universities
+SELECT COUNT(*)
+FROM universities;
+
+
+
+23 -Then, find out how many unique values there are in the university_city column.
+-- Count the number of distinct values in the university_city column
+SELECT COUNT(DISTINCT(university_city)) 
+FROM universities;
+
+
+
+24 -Using the above steps, identify the candidate key by trying out different combination of columns.
+1- Count the distinct records for all possible combinations of columns. If the resulting number x equals the number of all    rows in the table for a combination, you have discovered a superkey.
+
+2- Then remove one column after another until you can no longer remove columns without seeing the number x decrease. If that    is the case, you have discovered a (candidate) key.
+-- Try out different combinations
+SELECT COUNT(DISTINCT(firstname, lastname)) 
+FROM professors;
+
+
+
+25 -Rename the organization column to id in organizations. Make id a primary key and name it organization_pk.
+-- Rename the organization column to id
+ALTER TABLE organizations
+RENAME COLUMN organization TO id;
+
+-- Make id a primary key
+ALTER TABLE organizations
+ADD CONSTRAINT organization_pk PRIMARY KEY (id);
+
+--
+SELECT id
+FROM organizations;
+
+
+
+26 -Rename the university_shortname column to id in universities.
+Make id a primary key and name it university_pk.
+-- Rename the university_shortname column to id
+ALTER TABLE universities
+RENAME COLUMN university_shortname TO id;
+
+-- Make id a primary key
+ALTER TABLE universities
+ADD CONSTRAINT university_pk PRIMARY KEY(id);
+
+
+
+THEORY
+SURROGATE KEY  --> Artificial pimary key, not based on a native column in you data, but on a column that just exist for the sake of having a primary key.
+Opposite to the primary Key, they could change over time
+What is it in reallity the surrogate key? Imagine you don't have in your table a column which could identify you rows without duplicates, that is, a primaray key (it could be the serial number of a car's table). What we would like to do is crate a new enumerate column and set it as id column. Is create a a id column and link evry column to that id
+
+ALTER TABLE table_name
+ADD COLUMN column_c varchar(256);
+
+UPDATE table_name
+SET column_c = CONCAT(column_a, column_b);
+ALTER TABLE table_name
+ADD CONSTRAINT PRIMARY KEY
+
+Atomatic serial id. 
+ALTER TABLE table_name
+ADD COLUMN id serial PRIMARY KEY; 
+
+
+
+27 -
+1) Add a new column id with data type serial to the professors table.
+-- Add the new column to the table
+ALTER TABLE professors 
+ADD COLUMN id serial; -- (you could specify that as a primary key)
+
+2) Make id a primary key and name it professors_pkey.
+
+-- Make id a primary key
+ALTER TABLE professors
+ADD CONSTRAINT professors_pkey PRIMARY KEY(id);
+
+3) Write a query that returns all the columns and 10 rows from professors
+-- Have a look at the first 10 rows of professors
+SELECT *
+FROM professors
+LIMIT 10;
+
+
+
+28 -
+1) Count the number of distinct rows with a combination of the make and model columns.
+ -- Count the number of distinct rows with columns make, model
+SELECT COUNT(DISTINCT(make, model))
+FROM cars;
+
+2) Add a new column id with the data type varchar(128).
+-- Add the id column
+ALTER TABLE cars
+ADD COLUMN id varchar(128);
+
+3) Concatenate make and model into id using an UPDATE table_name SET column_name = ... query and the CONCAT() function.
+-- Update id with make + model
+UPDATE cars
+SET id = CONCAT(make, model);
+
+4) Make id a primary key and name it id_pk.
+-- Make id a primary key
+ALTER TABLE cars
+ADD CONSTRAINT id_pk PRIMARY KEY(id);
+
+5) Resume
+-- Count the number of distinct rows with columns make, model
+SELECT COUNT(DISTINCT(make, model)) 
+FROM cars;
+
+-- Add the id column
+ALTER TABLE cars
+ADD COLUMN id varchar(128);
+
+-- Update id with make + model
+UPDATE cars
+SET id = CONCAT(make, model);
+
+-- Make id a primary key
+ALTER TABLE cars
+ADD CONSTRAINT id_pk PRIMARY KEY(id);
+
+-- Have a look at the table
+SELECT * FROM cars;
+
+
+
+29 -Given the above description of a student entity, create a table students with the correct column types.
+Add a PRIMARY KEY for the social security number ssn.
+Note that there is no formal length requirement for the integer column. The application would have to make sure it's a correct SSN!
+-- Create the table
+CREATE TABLE students (
+  last_name VARCHAR(128) NOT NULL,
+  ssn integer PRIMARY KEY,
+  phone_no char(12)
+);
+
+
+
+
+THEORY: RELATIONSHIPS BETWEEN DATABASES 
+FOREIGN KEYS: A foreign key point to the primaty key of another table
+DOMAIn and the DATAtype muist be the same as the one of the primary key.
+ALTER TABLE table_name
+ADD CONSTRAINT column_name_fkey KEY(column_name_primary_key) REFERENCES b (id)
+
+Pay attention to the naming convention employed here: Usually, a foreign key referencing another primary key with name id is named x_id, where x is the name of the referencing table in the singular form.
+
+
+30 -
+1) Rename the university_shortname column to university_id in professors.
+-- Rename the university_shortname column
+ALTER TABLE professors
+RENAME COLUMN university_shortname TO university_id;
+
+--Check
+SELECT *
+FROM professors;
+
+2) Add a foreign key on university_id column in professors that references the id column in universities.
+Name this foreign key professors_fkey.
+ -- Add a foreign key on professors referencing universities
+ALTER TABLE professors
+ADD CONSTRAINT professors_fkey FOREIGN KEY (university_id) REFERENCES universities (id);
+
+
+
+31 -
+Foreign key constraints help you to keep order in your database mini-world. In your database, for instance, only professors belonging to Swiss universities should be allowed, as only Swiss universities are part of the universities table.
+-- Try to insert a new professor
+INSERT INTO professors (firstname, lastname, university_id)
+VALUES ('Albert', 'Einstein', 'UZH');
+
+
+
+
+THEORY: JOIN TABLES
+
+SELECT ...
+FROM table_a
+JOIN table_b
+ON ...
+WHERE ...
+
+CREATE TABLE table_name
+ column_a(new) data_type REFERENCES table_name (column_name)
+ column_b(new) data_type REFERENCES table_name (column_name)
+ function varchar(256)
+);
+
+
+
+32 -JOIN professors with universities on professors.university_id = universities.id, i.e., retain all records where the foreign key of professors is equal to the primary key of universities.
+Filter for university_city = 'Zurich'.
+
+-- Select all professors working for universities in the city of Zurich
+SELECT professors.lastname, universities.id, universities.university_city
+FROM professors
+JOIN universities
+ON professors.university_id = universities.id
+WHERE universities.university_city = 'Zurich'; 
+
+
+
+
+33 - 
+1) Add a professor_id column with integer data type to affiliations, and declare it to be a foreign key that references the id column in professors.
+-- Add a professor_id column
+ALTER TABLE affiliations
+ADD COLUMN professor_id integer REFERENCES professors (id);
+
+2) Rename the organization column in affiliations to organization_id.
+-- Rename the organization column to organization_id
+ALTER TABLE affiliations
+RENAME organization TO organization_id;
+
+3)Add a foreign key constraint on organization_id so that it references the id column in organizations.
+-- Add a foreign key on organization_id
+ALTER TABLE affiliations
+ADD CONSTRAINT affiliations_organization_fkey FOREIGN KEY (organization_id) REFERENCES organizations (ID); 
+
+RESUME
+-- Add a professor_id column
+ALTER TABLE affiliations
+ADD COLUMN professor_id integer REFERENCES professors (id);
+
+-- Rename the organization column to organization_id
+ALTER TABLE affiliations
+RENAME organization TO organization_id;
+
+-- Add a foreign key on organization_id
+ALTER TABLE affiliations
+ADD CONSTRAINT affiliations_organization_fkey FOREIGN KEY (organization_id) REFERENCES organizations (ID); 
+
+
+
+
+THEORY: UPDATE TABLE 
+
+UPDATE table_a
+SET column_to_update = table_b.column_to_update_from
+FROM table_b
+WHERE condition1 AND condition2 AND ...;
+
+
+
+34 -Update the professor_id column with the corresponding value of the id column in professors.
+
+-- Update professor_id to professors.id where firstname, lastname correspond to rows in professors
+UPDATE affiliations
+SET professor_id = professors.id
+FROM professors
+WHERE affiliations.firstname = professors.firstname AND affiliations.lastname = professors.lastname;
+
+-- Have a look at the 10 first rows of affiliations again
+SELECT *
+FROM affiliations
+LIMIT 10;
+
+
+
+35 -Drop the firstname and lastname columns from the affiliations table.
+-- Drop the firstname column
+ALTER TABLE affiliations
+DROP COLUMN firstname;
+
+-- Drop the lastname column
+ALTER TABLE affiliations
+DROP COLUMN lastname;
+
+-- Show the first 10 rows
+SELECT *
+FROM affiliations
+LIMIT 10;
+
+
+
+
+
+THEORY: referential integrity.
+A record referencing another table must refer to an existing record in that table. (A record in table a cannot point to a record in table b that doesn't exist)
+
+Violations:
+... if a record in table B that is referenced from a record in table A is deleted.
+...if a record in table A referencing a non-existing record from table B is inserted.
+
+Sealing with violations 
+CREATE TABLE a (
+ id integer PRIMARY KEY,
+ column_a varchar(64),
+ ...,
+ b_id integer REFERENCES b (id) ON DELETE NO ACTION
+);
+(The example above is what will happen in a general situation)
+
+
+CREATE TABLE a (
+ id integer PRIMARY KEY,
+ column_a varchar(64),
+ ...,
+ b_id integer REFERENCES b (id) ON DELETE CASCADE
+);
+( you could specify the "CASCADE" option, which will first allow the delation of the record on table B, and then will automatically delete all referencing records in table A)
+
+
+
+
+
+36 -Have a look at the existing foreign key constraints by querying table_constraints in information_schema.
+1)-- Identify the correct constraint name
+SELECT constraint_name, table_name, constraint_type
+FROM information_schema.table_constraints
+WHERE constraint_type = 'FOREIGN KEY';
+
+2) -- Drop the right foreign key constraint
+ALTER TABLE affiliations
+DROP CONSTRAINT affiliations_organization_id_fkey;
+
+3)-- Add a new foreign key constraint from affiliations to organizations which cascades deletion
+ALTER TABLE affiliations
+ADD CONSTRAINT affiliations_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES organizations (id) ON DELETE CASCADE;
+
+4) -- Delete an organization 
+DELETE FROM organizations 
+WHERE id = 'CUREM';
+
+Check that no more affiliations with this organization exist
+SELECT * FROM affiliations
+WHERE organization_id = 'CUREM';
+
+
+
+
+
+37 -Count the number of total affiliations by university. 
+Sort the result by that count, in descending order.
+SELECT COUNT(affiliations.*) AS number_afiliations, professors.university_id 
+FROM affiliations
+JOIN professors
+ON affiliations.professor_id = professors.id
+-- Group by the ids of professors
+GROUP BY professors.university_id
+ORDER BY number_afiliations DESC;
+
+
+
+38 -
+1)Join all tables in the database (starting with affiliations, professors, organizations, and universities) and look at the result.-- Join all tables
+SELECT *
+FROM affiliations
+JOIN professors
+ON affiliations.professor_id = professors.id
+JOIN organizations
+ON affiliations.organization_id = organizations.id
+JOIN universities
+ON professors.university_id = universities.id;
+
+2) Now group the result by organization sector, professor, and university city.Count the resulting number of rows.
+-- Group the table by organization sector, professor and university city
+SELECT COUNT(*), organizations.organization_sector, 
+professors.id, universities.university_city
+FROM affiliations
+JOIN professors
+ON affiliations.professor_id = professors.id
+JOIN organizations
+ON affiliations.organization_id = organizations.id
+JOIN universities
+ON professors.university_id = universities.id
+GROUP BY organizations.organization_sector, 
+professors.id, universities.university_city;
+
+3) Only retain rows with "Media & communication" as organization sector, and sort the table by count, in descending order.
+-- Filter the table and sort it
+SELECT COUNT(*), organizations.organization_sector, 
+professors.id, universities.university_city
+FROM affiliations
+JOIN professors
+ON affiliations.professor_id = professors.id
+JOIN organizations
+ON affiliations.organization_id = organizations.id
+JOIN universities
+ON professors.university_id = universities.id
+WHERE organizations.organization_sector = 'Media & communication'
+GROUP BY organizations.organization_sector, 
+professors.id, universities.university_city
+ORDER BY COUNT DESC;
+
+
+
+
+
+THEORY: REFER TO TABLES 
+
+Every time we want ro refer to a table inside a schema, we have to refer to that schema. 
+For example, if our schema it's VIDEOGAMES, if we want to rerer to to a table inside that schema like customers, we'll have to set where is this table stored. 
+
+videogames.customers
+
+If we want we can set the path 
+
+SET search_path TO schema_name
+
+SET search_path TO VIDEOGAMES
+
+
+
+
+
+39 -
+40 -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+LINKS
+
+https://www.postgresql.org/docs/10/datatype-datetime.html#DATATYPE-DATETIME-INPUT
+https://www.w3schools.com/sql/sql_unique.asp
